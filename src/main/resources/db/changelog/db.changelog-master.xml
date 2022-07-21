@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="1" author="developer">
+        <createTable tableName="person_account">
+            <column name="id" type="uuid">
+                <constraints nullable="false" primaryKey="true" unique="true" />
+            </column>
+            <column name="person_id" type="uuid" remarks="Участник">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_num" type="varchar(20)" remarks="Номер счёта">
+                <constraints nullable="false"/>
+            </column>
+            <column name="balance" type="number(18)" remarks="Баланс">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <createTable tableName="balance_request" remarks="Информация о заблоченных суммах">
+            <column name="id" type="uuid">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="person_id" type="uuid" remarks="Участник">
+                <constraints nullable="false"/>
+            </column>
+            <column name="balance" type="number(18)" remarks="Сумма">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
