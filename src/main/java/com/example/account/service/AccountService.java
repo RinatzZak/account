@@ -3,7 +3,6 @@ package com.example.account.service;
 import com.example.account.exception.SumNotExistException;
 import com.example.account.model.BalanceRequest;
 import com.example.account.model.PersonAccount;
-import lombok.SneakyThrows;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
