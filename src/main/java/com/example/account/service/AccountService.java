@@ -49,10 +49,10 @@ public class AccountService {
                 new BeanPropertyRowMapper<>(BalanceRequest.class));
     }
 
-    @SneakyThrows
+
     @Transactional(rollbackFor = Exception.class,
     isolation = Isolation.REPEATABLE_READ)
-    public void createBalanceRequest(UUID requestId, UUID personId, BigDecimal requiredSum) {
+    public void createBalanceRequest(UUID requestId, UUID personId, BigDecimal requiredSum) throws SumNotExistException {
         var exitSum = getPersonAccount(personId)
                 .stream()
                 .map(PersonAccount::getBalance)
@@ -82,7 +82,6 @@ public class AccountService {
         jdbcTemplate.update(DELETE_REQUEST, Map.of("requestId", requestId));
     }
 
-    @SneakyThrows
     @Transactional(rollbackFor = Exception.class,
     isolation = Isolation.REPEATABLE_READ)
     public void executeBalanceRequest(UUID requestId, UUID personId, BigDecimal spentSum) {
