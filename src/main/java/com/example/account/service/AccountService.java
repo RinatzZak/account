@@ -18,10 +18,10 @@ import java.util.UUID;
 public class AccountService {
 
     private static final String SELECT_ACC = "select id, person_id, account_num, balance" +
-            "from person_account where person_id = :personId for update";
+            " from person_account where person_id = :personId for update";
 
     private static final String SELECT_BALANCE_REQUEST =
-            "select * from balance_request 1s where 1s.person_id = :personId for update";
+            "select * from balance_request ls where ls.person_id = :personId for update";
 
     private static final String INSERT_REQUEST =
             "insert into balance_request (id, person_id, balance) values (:id, :personId, :balance)";
