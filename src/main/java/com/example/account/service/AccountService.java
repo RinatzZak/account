@@ -66,7 +66,7 @@ public class AccountService {
                 .map(BalanceRequest::getBalance)
                 .reduce(BigDecimal::add);
 
-        if (blockedSum.isPresent() && exitSum.get().negate().compareTo(requiredSum) < 0) {
+        if (blockedSum.isPresent() && exitSum.get().add(blockedSum.get().negate()).compareTo(requiredSum) < 0) {
             throw new SumNotExistException(personId, requiredSum);
         }
 
