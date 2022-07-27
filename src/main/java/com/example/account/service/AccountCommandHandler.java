@@ -3,6 +3,7 @@ package com.example.account.service;
 import com.example.account.exception.SumNotExistException;
 import com.example.account.model.command.ChangeAccount;
 import com.example.account.model.command.CheckAccount;
+import com.example.account.model.event.StocksRequestCanceled;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,5 +30,9 @@ public class AccountCommandHandler {
     public void changeAccount(ChangeAccount command) {
         accountService.executeBalanceRequest(command.getRequestId(), command.getPersonId(), command.getSum());
         eventSender.sendAccountChanged(command.getRequestId(), command.getPersonId(), command.getSum());
+    }
+
+    public void cancelBalanceRequest(StocksRequestCanceled event) {
+        accountService.cancelBalanceRequest(event.getRequestId());
     }
 }
