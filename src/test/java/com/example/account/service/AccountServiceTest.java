@@ -143,5 +143,68 @@ class AccountServiceTest {
 
     @Test
     void executeBalanceRequestForTwoAccount() throws SumNotExistException {
+        UUID personId = UUID.randomUUID();
+        jdbcTemplate.update("insert into person_account (id, person_id, account_num, balance)"
+                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 180_000);
+        jdbcTemplate.update("insert into person_account (id, person_id, account_num, balance)"
+                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 20_000);
+        UUID requestId = UUID.randomUUID();
+
+        service.createBalanceRequest(requestId, personId, valueOf(200_000));
+
+        service.executeBalanceRequest(requestId, personId, valueOf(198_004));
+
+        var result = jdbcTemplate.queryForMap("select count(*) as result from " +
+                "balance_request where person_id = ?", personId);
+        assertTrue(result.size() > 0);
+        assertEquals(0L, result.get("result"));
+
+        var resultAcc = jdbcTemplate.queryForMap("select  sum(balance) as result from " +
+                "person_account where person_id = ?", personId);
+        assertEquals(valueOf(1996), resultAcc.get("result"));
+    }
+
+    @Test
+    public void executeTwoBalanceRequestForOneAccount() throws SumNotExistException {
+        UUID personId = UUID.randomUUID();
+        jdbcTemplate.update("insert into person_account (id, person_id, account_num, balance)"
+                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 200_000);
+
+        UUID requestId = UUID.randomUUID();
+        service.createBalanceRequest(requestId, personId, valueOf(10_000));
+        service.createBalanceRequest(UUID.randomUUID(), personId, valueOf(160_000));
+
+        service.executeBalanceRequest(requestId, personId, valueOf(10_000));
+
+        var result = jdbcTemplate.queryForMap("select count(*) as result from balance_request " +
+                "where person_id = ?", personId);
+        assertTrue(result.size() > 0);
+        assertEquals(1L, result.get("result"));
+
+        var resultAcc = jdbcTemplate.queryForMap("select sum(balance) as result from " +
+                "person_account where person_id = ?", personId);
+        assertEquals(valueOf(190_000), resultAcc.get("result"));
+    }
+
+    @Test
+    public void cancelBalanceRequest() throws SumNotExistException {
+        UUID personId = UUID.randomUUID();
+        jdbcTemplate.update("insert into person_account (id, person_id, account_num, balance)"
+                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 200_000);
+        UUID requestId = UUID.randomUUID();
+        service.createBalanceRequest(requestId, personId, valueOf(10_000));
+        service.createBalanceRequest(UUID.randomUUID(), personId, valueOf(160_000));
+
+        service.cancelBalanceRequest(requestId);
+
+        var result = jdbcTemplate.queryForMap("select count(*) as result from balance_request" +
+                " where person_id = ?", personId);
+
+        assertTrue(result.size() > 0);
+        assertEquals(1L, result.get("result"));
+
+        var resultAcc = jdbcTemplate.queryForMap("select sum(balance) as result from person_account " +
+                "where person_id = ?", personId);
+        assertEquals(valueOf(200_000L), resultAcc.get("result"));
     }
 }
