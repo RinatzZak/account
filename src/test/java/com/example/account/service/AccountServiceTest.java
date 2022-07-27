@@ -31,10 +31,10 @@ class AccountServiceTest {
     void createBalanceRequestLessThanAccount() throws SumNotExistException {
         UUID personId = UUID.randomUUID();
         jdbcTemplate.update("insert into person_account (id, person_id, account_num, balance)"
-                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 200000);
+                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 200_000);
 
         UUID requestId = UUID.randomUUID();
-        service.createBalanceRequest(requestId, personId, valueOf(199000));
+        service.createBalanceRequest(requestId, personId, valueOf(199_000));
 
         var result = jdbcTemplate.queryForMap(" select * from balance_request where id = ?", requestId);
 
@@ -47,10 +47,10 @@ class AccountServiceTest {
     public void createBalanceRequestForOneAccount() throws SumNotExistException {
         UUID personId = UUID.randomUUID();
         jdbcTemplate.update("insert into person_account (id, person_id, account_num, balance)"
-                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 200000);
+                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 200_000);
 
         UUID requestId = UUID.randomUUID();
-        service.createBalanceRequest(requestId, personId, valueOf(200000));
+        service.createBalanceRequest(requestId, personId, valueOf(200_000));
 
         var result = jdbcTemplate.queryForMap(" select * from balance_request where id = ?", requestId);
 
@@ -63,13 +63,13 @@ class AccountServiceTest {
     public void createBalanceRequestForTwoAccount() throws SumNotExistException {
         UUID personId = UUID.randomUUID();
         jdbcTemplate.update("insert into person_account (id, person_id, account_num, balance)"
-                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 180000);
+                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 180_000);
         jdbcTemplate.update("insert into person_account (id, person_id, account_num, balance)"
-                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380082", 20000);
+                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380082", 20_000);
 
 
         UUID requestId = UUID.randomUUID();
-        service.createBalanceRequest(requestId, personId, valueOf(200000));
+        service.createBalanceRequest(requestId, personId, valueOf(200_000));
 
         var result = jdbcTemplate.queryForMap(" select * from balance_request where id = ?", requestId);
 
@@ -82,22 +82,23 @@ class AccountServiceTest {
     public void createBalanceRequestForTwoAccountNegative() {
         UUID personId = UUID.randomUUID();
         jdbcTemplate.update("insert into person_account (id, person_id, account_num, balance)"
-                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 180000);
+                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 180_000);
         jdbcTemplate.update("insert into person_account (id, person_id, account_num, balance)"
-                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380082", 20000);
+                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380082", 20_000);
 
         UUID requestId = UUID.randomUUID();
-        Throwable throwable = assertThrows(SumNotExistException.class, () -> service.createBalanceRequest(requestId, personId, valueOf(300000)));
-        assertTrue(throwable.getMessage().contains("Person " + personId + " doesn't have needed sum " + 300000));
+        Throwable throwable = assertThrows(SumNotExistException.class,
+                () -> service.createBalanceRequest(requestId, personId, valueOf(300_000)));
+        assertTrue(throwable.getMessage().contains("Person " + personId + " doesn't have needed sum " + 300_000));
     }
 
     @Test
     public void createTwoBalanceRequestNegative() {
         UUID personId = UUID.randomUUID();
         jdbcTemplate.update("insert into person_account (id, person_id, account_num, balance)"
-                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380082", 2000);
+                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380082", 2_000);
         jdbcTemplate.update("insert into person_account (id, person_id, account_num, balance)"
-                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380082", 20000);
+                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380082", 20_000);
 
         UUID requestId = UUID.randomUUID();
         Throwable throwable = assertThrows(SumNotExistException.class, () -> {
@@ -124,14 +125,23 @@ class AccountServiceTest {
     }
 
     @Test
-    void takeSumFromPersonAccount() {
+    public void createTwoBalanceRequestForOneAccount() throws SumNotExistException {
+        UUID personId = UUID.randomUUID();
+
+        jdbcTemplate.update("insert into person_account (id, person_id, account_num, balance)"
+                + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 200_000);
+
+        service.createBalanceRequest(UUID.randomUUID(), personId, valueOf(10_000));
+        service.createBalanceRequest(UUID.randomUUID(), personId, valueOf(150_000));
+
+        var result = jdbcTemplate.queryForMap("select count(*) as result from " +
+                "balance_request where person_id = ?", personId);
+
+        assertTrue(result.size() > 0);
+        assertEquals(2L, result.get("result"));
     }
 
     @Test
-    void cancelBalanceRequest() {
-    }
-
-    @Test
-    void executeBalanceRequest() {
+    void executeBalanceRequestForTwoAccount() throws SumNotExistException {
     }
 }
