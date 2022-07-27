@@ -11,6 +11,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import static java.math.BigDecimal.valueOf;
@@ -113,11 +114,13 @@ class AccountServiceTest {
                 + " values(?,?,?,?)", UUID.randomUUID(), personId, "3948509380081", 200_000);
 
         UUID requestId = UUID.randomUUID();
-        Assertions.assertThrows(DuplicateKeyException.class, () ->
+
+        Throwable throwable = Assertions.assertThrows(DuplicateKeyException.class, () ->
         {
             service.createBalanceRequest(requestId, personId, valueOf(2_000));
             service.createBalanceRequest(requestId, personId, valueOf(2_000));
         });
+        assertTrue((throwable.getMessage()).contains("Exception"));
     }
 
     @Test
